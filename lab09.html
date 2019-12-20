@@ -1,0 +1,82 @@
+<HTML>
+<BODY>
+<div class= "canvas">
+<canvas id ="lab09" width='500' height='400' style="border:1px solid black;"/>
+</div>
+<script>
+	function Fill(figure, color) {
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.moveTo(figure[0].x,figure[0].y);
+		for(var i in figure){
+			ctx.lineTo(figure[i].x,figure[i].y);
+		}
+		ctx.closePath();
+		ctx.fill();
+	}
+	
+	function colorSide (L, side, color){
+		var AB = { x: side[1].x-side[0].x,
+				   y: side[1].y-side[0].y, 
+				   z: side[1].z-side[0].z
+				};
+		var AC = { x: side[2].x-side[0].x, 
+				   y: side[2].y-side[0].y, 
+				   z: side[2].z-side[0].z
+				};
+		var Ny = (AB.z*AC.x-AC.z*AB.x)/(AC.y*AB.x-AB.y*AC.x);
+		var N = {x: -1*(Ny*AB.y+AB.z)/AB.x, 
+				 y: Ny, 
+				 z:1 
+				};
+		var beam = {x: side[0].x-L.x, 
+				    y: side[0].y-L.y, 
+					z: side[0].z-L.z
+				};
+		var cos = (N.x*beam.x+N.y*beam.y+N.z*beam.z)/Math.sqrt(N.x*N.x+N.y*N.y+N.z*N.z)/Math.sqrt(beam.x*beam.x+beam.y*beam.y+beam.z*beam.z);
+		var r = Math.round(((color&0xff0000)>>16)*Math.abs(cos));
+		var g = Math.round(((color&0x00ff00)>>8)*Math.abs(cos));
+		var b = Math.round(((color&0x0000ff))*Math.abs(cos));
+		var figure = [{x:side[0].x , 
+					   y:side[0].y},
+					  
+					  {x:side[1].x , 
+					   y:side[1].y }, 
+					   
+					  {x:side[2].x , 
+					   y:side[2].y }
+					];
+		var newColor = '#'+r.toString(16) + g.toString(16) + b.toString(16);
+		console.log(newColor);
+		Fill(figure, newColor);
+	}
+</script>
+<script>
+	var canvas = document.getElementById("lab09");
+	var ctx = canvas.getContext("2d");
+	
+	
+	var side1 = [ {x:100, y:300, z:50},
+				   {x:220, y:70, z:50}, 
+				   {x:300, y:300, z:50}
+				];
+	var side2 = [ {x:220, y:70, z:50}, 
+				   {x:300, y:300, z:50}, 
+				   {x:350, y:200, z:50}
+				];
+	var L = {x:100, y:120, z:100};
+	var color = "0x9fe0f0";
+	
+	var delta = 1;
+	setInterval(function (){
+		if (L.z == 200) delta = -1;
+		if (L.z == 100) delta = 1;
+		L.z += delta;
+		colorSide(L, side2, color);
+		colorSide(L, side1, color);
+		
+	}, 35);
+	
+</script> 
+</BODY>
+</HTML>
